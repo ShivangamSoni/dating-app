@@ -84,4 +84,19 @@ router.post("/like", authRequired, async (req, res) => {
     res.send({ message: "Like Sent!" });
 });
 
+/**
+ * Super Like a User
+ */
+router.post("/super-like", authRequired, async (req, res) => {
+    const { userId } = req.body;
+    const { sub } = req.payload;
+
+    sendNotification(userId, {
+        type: "Super Like",
+        message: "Someone Super Liked Your Image",
+        userId: sub,
+    });
+    res.send({ message: "Super Like Sent!" });
+});
+
 module.exports = router;
