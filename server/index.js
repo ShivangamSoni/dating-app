@@ -1,11 +1,17 @@
 require("dotenv").config();
 const express = require("express");
 const fileUpload = require("express-fileupload");
-const connectToDb = require("./lib/db");
+const cors = require("cors");
 
+const connectToDb = require("./lib/db");
 const apiRouter = require("./routes/api");
+const { createSocket } = require("./lib/socket");
 
 const app = express();
+const server = require("http").createServer(app);
+createSocket(server);
+
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(
@@ -22,7 +28,7 @@ app.use("/api", apiRouter);
 (async function main() {
     await connectToDb();
     const PORT = process.env.PORT;
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log(`Server Started at PORT: ${PORT}`);
     });
 })();
