@@ -3,6 +3,7 @@ const { Router } = require("express");
 
 const { User } = require("../Models/index");
 const { authRequired } = require("../Middleware/authRequired");
+const { sendNotification } = require("../lib/socket");
 
 const uploadFolder = path.join(__dirname, "../upload");
 const router = Router();
@@ -42,6 +43,9 @@ router.get("/:id/image", authRequired, async (req, res) => {
     }
 });
 
+/**
+ * Block a User
+ */
 router.post("/block", authRequired, async (req, res) => {
     const { userId } = req.body;
     const { sub } = req.payload;
@@ -65,6 +69,19 @@ router.post("/block", authRequired, async (req, res) => {
     } catch {
         res.status(500).send({ message: "Server Error! Try Again!" });
     }
+});
+
+/**
+ * Like a User
+ */
+router.post("/like", authRequired, async (req, res) => {
+    const { userId } = req.body;
+
+    sendNotification(userId, {
+        type: "Like",
+        message: "Someone Liked Your Image",
+    });
+    res.send({ message: "Like Sent!" });
 });
 
 module.exports = router;
