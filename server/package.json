@@ -4,7 +4,9 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start:dev": "nodemon index.js"
+        "start": "node index.js",
+        "start:dev": "nodemon index.js",
+        "db:seed:dev": "node ./dev/seed.db.js"
     },
     "keywords": [],
     "author": "",
