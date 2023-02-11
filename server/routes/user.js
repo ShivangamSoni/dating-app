@@ -11,13 +11,20 @@ const router = Router();
  * Get All Users Data
  */
 router.get("/", authRequired, async (req, res) => {
-    const payload = req.payload;
-    const users = await User.find({ _id: { $ne: payload.sub } });
-    const usersData = users.map((user) => ({
-        id: user.id,
-        email: user.email,
-    }));
-    res.send({ users: usersData });
+    const { sub } = req.payload;
+    try {
+        const authUser = await User.findById(sub);
+        const users = await User.find({
+            _id: { $ne: sub, $nin: authUser.blocked },
+        });
+        const usersData = users.map((user) => ({
+            id: user.id,
+            email: user.email,
+        }));
+        res.send({ users: usersData });
+    } catch {
+        res.status(500).send({ message: "Server Error! Try Again!" });
+    }
 });
 
 /**
@@ -26,9 +33,38 @@ router.get("/", authRequired, async (req, res) => {
 router.get("/:id/image", authRequired, async (req, res) => {
     const { id } = req.params;
 
-    const user = await User.findById(id);
-    const imageFile = uploadFolder + "/" + user.image;
-    res.sendFile(imageFile);
+    try {
+        const user = await User.findById(id);
+        const imageFile = uploadFolder + "/" + user.image;
+        res.sendFile(imageFile);
+    } catch {
+        res.status(500).send({ message: "Server Error! Try Again!" });
+    }
+});
+
+router.post("/block", authRequired, async (req, res) => {
+    const { userId } = req.body;
+    const { sub } = req.payload;
+
+    if (!userId || userId === "") {
+        return res.status(400).send({ message: "Invalid Data" });
+    }
+
+    try {
+        const userToBlock = await User.findById(userId);
+        if (!userToBlock) {
+            return res.status(400).send({ message: "Invalid User ID" });
+        }
+
+        await User.findByIdAndUpdate(sub, {
+            $addToSet: {
+                blocked: userToBlock.id,
+            },
+        });
+        res.send({ message: "User Blocked" });
+    } catch {
+        res.status(500).send({ message: "Server Error! Try Again!" });
+    }
 });
 
 module.exports = router;
