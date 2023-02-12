@@ -4,7 +4,7 @@ import { useNotify } from "../Context/Notification";
 
 export default function Notification() {
     const {
-        state: { message, type, visible },
+        state: { message, image, type, visible },
         clearNotify,
     } = useNotify();
 
@@ -43,7 +43,16 @@ export default function Notification() {
             } ${typeBasedStyle}`}
         >
             {title && <h3 className="text-xl font-bold">{title}</h3>}
-            <p className="text-md">{message}</p>
+            <div className="grid grid-cols-[auto,1fr] items-center gap-1">
+                {image && (
+                    <img
+                        className="w-8 h-8 object-contain rounded-full"
+                        src={image}
+                        alt=""
+                    />
+                )}
+                <p className="text-md">{message}</p>
+            </div>
             <button
                 className="absolute top-1 right-2 text-xl text-slate-900"
                 onClick={clearNotify}

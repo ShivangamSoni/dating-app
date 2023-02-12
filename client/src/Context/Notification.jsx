@@ -1,8 +1,9 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useReducer, useRef } from "react";
 
 const defaultState = {
     message: "",
     type: "",
+    image: "",
     visible: false,
 };
 
@@ -33,11 +34,17 @@ const NotifyContext = createContext(null);
 
 export default function NotifyProvider({ children }) {
     const [state, dispatch] = useReducer(reducer, defaultState);
+    const timeOutRef = useRef(null);
 
-    function setNotify({ message, type }) {
+    function setNotify({ message, image, type }) {
+        if (timeOutRef.current !== null) {
+            clearTimeout(timeOutRef.current);
+            timeOutRef.current = null;
+        }
+
         dispatch({
             type: TYPES.get("set"),
-            payload: { message, type },
+            payload: { message, image, type },
         });
 
         setTimeout(() => {
@@ -48,8 +55,9 @@ export default function NotifyProvider({ children }) {
         }, 500);
 
         // Auto Clear
-        setTimeout(() => {
+        timeOutRef.current = setTimeout(() => {
             clearNotify();
+            timeOutRef.current = null;
         }, 3000);
     }
 
