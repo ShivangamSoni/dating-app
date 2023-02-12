@@ -3,10 +3,12 @@ import { useMutation, useQuery } from "react-query";
 
 import axios from "../lib/axios";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useNotify } from "./Notification";
 
 const AuthContext = createContext(null);
 
 export default function AuthProvider({ children }) {
+    const { setNotify } = useNotify();
     const [token, setToken] = useLocalStorage("token");
     const [user, setUser] = useState(null);
 
@@ -22,8 +24,10 @@ export default function AuthProvider({ children }) {
         retry: 0,
         enabled: false,
         onError({ response }) {
-            // TODO: Notify Token Expired
-            console.error(response.data.message);
+            setNotify({
+                message: "Logged Out! Token Expired!",
+                type: "warning",
+            });
             setToken(null);
         },
     });
@@ -55,12 +59,20 @@ export default function AuthProvider({ children }) {
         },
         onSuccess({ token }) {
             setToken(token);
+            setNotify({
+                message: "Logged In",
+                type: "success",
+            });
         },
     });
 
     function logout() {
         setToken(null);
         setUser(null);
+        setNotify({
+            message: "Logged Out",
+            type: "success",
+        });
     }
 
     useEffect(() => {

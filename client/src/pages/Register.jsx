@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import axios from "../lib/axios";
+import { useNotify } from "../Context/Notification";
 
 import Button from "../components/Button";
 import Form from "../components/Form";
@@ -17,6 +18,7 @@ const RegisterSchema = z.object({
 });
 
 export default function Register() {
+    const { setNotify } = useNotify();
     const navigate = useNavigate();
     const [image, setImage] = useState(null);
     const [imageError, setImageError] = useState("");
@@ -32,7 +34,10 @@ export default function Register() {
             ).data;
         },
         onSuccess({ message }) {
-            // TODO: Show Notification
+            setNotify({
+                message: "Registered Successfully",
+                type: "success",
+            });
             navigate("/login");
         },
     });
