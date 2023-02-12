@@ -37,7 +37,7 @@ $ npm i
 
 ### Add Environment Variables
 
-```json
+```
 // ./server/.env
 PORT=<PORT#>
 MONGODB_URI=<MONGODB_URI> // Format: "mongodb://<user>:<password>@<Cluster/Localhost>/<Database>?<Additional Params>"
