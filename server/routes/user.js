@@ -13,16 +13,32 @@ const router = Router();
  */
 router.get("/", authRequired, async (req, res) => {
     const { sub } = req.payload;
+    let currentPage = req.query.p || 1;
+    currentPage = parseInt(currentPage);
+    const usersPerPage = 3;
+
     try {
         const authUser = await User.findById(sub);
-        const users = await User.find({
+        const usersCount = await User.countDocuments({
             _id: { $ne: sub, $nin: authUser.blocked },
         });
+
+        const totalPages = Math.ceil(usersCount / usersPerPage);
+
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const users = await User.find({
+            _id: { $ne: sub, $nin: authUser.blocked },
+        })
+            .skip((currentPage - 1) * usersPerPage)
+            .limit(usersPerPage);
         const usersData = users.map((user) => ({
             id: user.id,
             email: user.email,
         }));
-        res.send({ users: usersData });
+        res.send({ users: usersData, totalPages });
     } catch {
         res.status(500).send({ message: "Server Error! Try Again!" });
     }
