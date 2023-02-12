@@ -23,20 +23,28 @@ router.post("/register", async (req, res) => {
         return res.status(400).send({ message: "Incomplete Data" });
     }
 
+    const count = await User.countDocuments({ email });
+
+    if (count > 0) {
+        return res.status(409).send({ message: "Email already Registered" });
+    }
+
+    const hashedPassword = await hash(password, 10);
+
+    const user = new User({
+        email: email.toLowerCase(),
+        password: hashedPassword,
+        image: image.name,
+    });
+
     if (!/^image/.test(image.mimetype)) {
         return res.status(400).send({ message: "Only Images Allowed" });
     }
 
-    image.mv(uploadFolder + "/" + image.name);
-
-    const hashedPassword = await hash(password, 10);
+    image.mv(uploadFolder + "/" + user.id + "-" + image.name);
 
     try {
-        const user = await new User({
-            email: email.toLowerCase(),
-            password: hashedPassword,
-            image: image.name,
-        }).save();
+        await user.save();
 
         res.status(201).send({ message: "Registered Successfully" });
     } catch {
