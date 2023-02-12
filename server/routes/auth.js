@@ -34,16 +34,18 @@ router.post("/register", async (req, res) => {
     const user = new User({
         email: email.toLowerCase(),
         password: hashedPassword,
-        image: image.name,
     });
+
+    const imageName = user.id + "-" + image.name;
 
     if (!/^image/.test(image.mimetype)) {
         return res.status(400).send({ message: "Only Images Allowed" });
     }
 
-    image.mv(uploadFolder + "/" + user.id + "-" + image.name);
+    image.mv(uploadFolder + "/" + imageName);
 
     try {
+        user.image = imageName;
         await user.save();
 
         res.status(201).send({ message: "Registered Successfully" });
