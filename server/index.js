@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { join } = require("path");
 const express = require("express");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
@@ -10,6 +11,8 @@ const { createSocket } = require("./lib/socket");
 const app = express();
 const server = require("http").createServer(app);
 createSocket(server);
+
+app.use(express.static(join(__dirname, "../", "client", "dist")));
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
