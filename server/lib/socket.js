@@ -25,7 +25,6 @@ exports.createSocket = function (server) {
             const sub = socket.payload.sub;
             // Subscribe to User Specific Channel
             socket.join(sub);
-            console.log(`Connected to Channel: ${sub}`);
         });
     });
 };

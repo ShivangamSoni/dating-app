@@ -107,12 +107,18 @@ router.post("/super-like", authRequired, async (req, res) => {
     const { userId } = req.body;
     const { sub } = req.payload;
 
-    sendNotification(userId, {
-        type: "Super Like",
-        message: "Someone Super Liked Your Image",
-        userId: sub,
-    });
-    res.send({ message: "Super Like Sent!" });
+    try {
+        const user = await User.findById(sub);
+
+        sendNotification(userId, {
+            type: "Super Like",
+            message: `${user.email} Super Liked Your Image`,
+            userId: sub,
+        });
+        res.send({ message: "Super Like Sent!" });
+    } catch {
+        res.status(500).send({ message: "Server Error! Try Again!" });
+    }
 });
 
 /**
