@@ -3,7 +3,9 @@ import Input from "./Input";
 export default function Form({ title, error, children, onSubmit }) {
     return (
         <>
-            <h1 className="text-3xl font-bold mb-8 text-center">{title}</h1>
+            <h1 className="text-3xl font-bold mb-8 uppercase text-center">
+                {title}
+            </h1>
             <form
                 onSubmit={onSubmit}
                 className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-5 items-center justify-items-end"
@@ -39,4 +41,8 @@ Form.Error = function ({ children, align = "start" }) {
             {children}
         </span>
     );
+};
+
+Form.CustomField = function ({ children }) {
+    return <div className="col-span-full w-full">{children}</div>;
 };
