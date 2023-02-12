@@ -4,6 +4,7 @@ const { hash, compare } = require("bcrypt");
 
 const { User } = require("../Models/index");
 const { signJwt } = require("../lib/jwt");
+const { authRequired } = require("../Middleware/authRequired");
 
 const uploadFolder = path.join(__dirname, "../upload");
 const router = Router();
@@ -67,6 +68,19 @@ router.post("/login", async (req, res) => {
 
         const token = signJwt(user.id);
         res.status(201).send({ message: "Logged In", token });
+    } catch {
+        res.status(500).send({ message: "Server Error. Try Again!" });
+    }
+});
+
+/**
+ * Verify Token
+ */
+router.get("/verify", authRequired, async (req, res) => {
+    const { sub } = req.payload;
+    try {
+        const user = await User.findById(sub);
+        res.status(200).send({ message: "Logged In" });
     } catch {
         res.status(500).send({ message: "Server Error. Try Again!" });
     }

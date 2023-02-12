@@ -99,4 +99,22 @@ router.post("/super-like", authRequired, async (req, res) => {
     res.send({ message: "Super Like Sent!" });
 });
 
+/**
+ * Get Auth Users Data
+ */
+router.get("/me", authRequired, async (req, res) => {
+    const { sub } = req.payload;
+    try {
+        const user = await User.findById(sub);
+        res.send({
+            user: {
+                id: user.id,
+                email: user.email,
+            },
+        });
+    } catch {
+        res.status(500).send({ message: "Server Error! Try Again!" });
+    }
+});
+
 module.exports = router;
